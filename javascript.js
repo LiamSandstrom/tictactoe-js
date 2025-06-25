@@ -36,12 +36,18 @@ const gameFlow = (function () {
     }
   };
 
+  const reset = function () {
+    round = 1;
+    currentPlayer = players.at(0);
+    board.populateCells();
+  };
+
   const getRound = () => round;
   const getCurrentPlayer = () => currentPlayer;
 
   init();
 
-  return { getRound, getCurrentPlayer, incrementRound };
+  return { getRound, getCurrentPlayer, incrementRound, reset };
 })();
 
 const board = (function () {
@@ -66,7 +72,14 @@ const board = (function () {
   };
 
   const markArea = function ([row, column]) {
-    if (row < 0 || row > size - 1 || column < 0 || column > size - 1 || row == null || column == null) {
+    if (
+      row < 0 ||
+      row > size - 1 ||
+      column < 0 ||
+      column > size - 1 ||
+      row == null ||
+      column == null
+    ) {
       console.log("Enter Valid area please");
       return;
     }
@@ -130,8 +143,7 @@ const board = (function () {
         return true;
       };
 
-      if(leftDiagonal()) return true;
-
+      if (leftDiagonal()) return true;
     };
 
     if (
@@ -147,7 +159,8 @@ const board = (function () {
   };
 
   populateCells();
-  return { markArea };
+
+  return { markArea, populateCells };
 })();
 
 //board module
