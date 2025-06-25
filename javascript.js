@@ -2,7 +2,7 @@ const Player = function (newName, newId, newMarker) {
   const name = newName;
   const id = newId;
   const marker = newMarker;
-  const score = 0;
+  let score = 0;
 
   const getName = () => name;
   const getId = () => id;
@@ -15,20 +15,33 @@ const Player = function (newName, newId, newMarker) {
 
 const gameFlow = (function () {
   const players = [];
-  const round = 0;
+  let round = 1;
+  let currentPlayer = null;
 
   const init = function () {
     const player1 = Player("bob", players.length + 1, "X");
     const player2 = Player("zoo", players.length + 1, "Y");
+
+    players.push(player1);
+    players.push(player2);
+    currentPlayer = player1;
   };
 
-  const incrementRound = function () {};
+  const incrementRound = function () {
+    round++;
+    if (currentPlayer == players.at(0)) {
+      currentPlayer = players.at(1);
+    } else {
+      currentPlayer = players.at(0);
+    }
+  };
 
   const getRound = () => round;
+  const getCurrentPlayer = () => currentPlayer;
 
   init();
 
-  return { getRound };
+  return { getRound, getCurrentPlayer, incrementRound };
 })();
 
 const board = (function () {
@@ -52,7 +65,12 @@ const board = (function () {
     return row * size + column;
   };
 
-  const markArea = function (player, [row, column]) {
+  const markArea = function ([row, column]) {
+    if (row < 0 || row > size - 1 || column < 0 || column > size - 1 || row == null || column == null) {
+      console.log("Enter Valid area please");
+      return;
+    }
+    const player = gameFlow.getCurrentPlayer();
     const index = cordsToIndex([row, column]);
     const area = cells.at(index);
     if (area != null) {
@@ -63,37 +81,70 @@ const board = (function () {
     const marker = player.getMarker();
     cells[index] = marker;
     console.log(cells);
-    checkWin();
+    if (checkWin([row, column])) {
+      return;
+    }
+    gameFlow.incrementRound();
   };
 
-  const checkWin = function ([row, column], player) {
-    if (gameFlow.getRound < size * 2 - 1) return;
+  const checkWin = function ([row, column]) {
+    if (gameFlow.getRound() < size * 2 - 1) return;
+
+    console.log("CHECK WIN");
+
+    const player = gameFlow.getCurrentPlayer();
 
     const checkVertical = function () {
       for (let i = 0; i < size; i++) {
-        if (cells.at(cordsToIndex([i, column])) != player.getMarker()) return false;
+        if (cells.at(cordsToIndex([i, column])) != player.getMarker())
+          return false;
       }
       return true;
     };
 
-    const checkHorizontal = function(){
-        for(let i = 0; i < size; i++){
-        if (cells.at(cordsToIndex([row, i])) != player.getMarker()) return false;
+    const checkHorizontal = function () {
+      for (let i = 0; i < size; i++) {
+        if (cells.at(cordsToIndex([row, i])) != player.getMarker())
+          return false;
+      }
+      return true;
+    };
+
+    const checkDiagonal = function () {
+      const rightDiagonal = () => {
+        for (let i = 0; i < size * size; i += size + 1) {
+          if (cells.at(i) != player.getMarker()) {
+            return false;
+          }
         }
         return true;
-    }
+      };
+      if (rightDiagonal()) return true;
 
-    if(checkVertical() == true || checkDiagonal() == true || checkHorizontal() == true) return true;
+      const leftDiagonal = () => {
+        for (let i = size - 1; i <= size + size; i += 2) {
+          if (cells.at(i) != player.getMarker()) {
+            return false;
+          }
+        }
+        return true;
+      };
+
+      if(leftDiagonal()) return true;
+
+    };
+
+    if (
+      checkVertical() == true ||
+      checkDiagonal() == true ||
+      checkHorizontal() == true
+    ) {
+      console.log("WINNER: " + gameFlow.getCurrentPlayer().getName());
+      gameFlow.getCurrentPlayer().incrementScore();
+      return true;
+    }
     return false;
   };
-  
-  const checkDiagonal = function(){
-    for(let i = 0; i < size * size; i += (size + 1)){
-        if(cells.at(i)){
-
-        }
-    }
-  }
 
   populateCells();
   return { markArea };
