@@ -158,27 +158,45 @@ const board = (function () {
     return false;
   };
 
+  const getSize = () => size;
+
   populateCells();
 
-  return { markArea, populateCells };
+  return { markArea, populateCells, getSize, indexToCords };
 })();
 
-//board module
-/*
-define size 
-pop board (cells in array)
-put marker(check if availabe, 
-when put markers > size check if win?)
- */
+const DOMboard = (function () {
+  const container = document.querySelector(".container");
+  const size = board.getSize();
 
-//player factory
-/*
-name 
-sign?
+  const createBoard = function () {
+    for (let i = 0; i < size * size; i++) {
+      createCell(i);
+    }
+  };
 
- */
+  const createCell = function (i) {
+    const div = document.createElement("div");
+    div.classList.add("cell");
+    div.dataset.index = i;
+    addClickEvent(div);
 
-//Obj flow?
-//start game?
-//player turn?
-//players
+    container.appendChild(div);
+  };
+
+  const addClickEvent = function (div) {
+    div.addEventListener("click", () => {
+      addMarker(div);
+      board.markArea(board.indexToCords(div.dataset.index));
+    });
+  };
+
+  const addMarker = function (div) {
+    if(div.textContent != "") return;
+    div.textContent = gameFlow.getCurrentPlayer().getMarker();
+    div.classList.add("filled")
+    console.log("MARK");
+  };
+
+  createBoard();
+})();
