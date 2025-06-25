@@ -15,12 +15,13 @@ const Player = function (newName, newId, newMarker) {
 
 const gameFlow = (function () {
   const players = [];
+  let inGame = true;
   let round = 1;
   let currentPlayer = null;
 
   const init = function () {
-    const player1 = Player("bob", players.length + 1, "X");
-    const player2 = Player("zoo", players.length + 1, "Y");
+    const player1 = Player("bob", 1, "X");
+    const player2 = Player("zoo", 2, "Y");
 
     players.push(player1);
     players.push(player2);
@@ -42,12 +43,32 @@ const gameFlow = (function () {
     board.populateCells();
   };
 
+  const flipInGame = function () {
+    inGame = !inGame;
+  };
+
+  const win = function (player) {
+    flipInGame();
+    DOMHeader.setScores();
+  };
+
   const getRound = () => round;
   const getCurrentPlayer = () => currentPlayer;
+  const getInGame = () => inGame;
+  const getPlayers = () => players;
 
   init();
 
-  return { getRound, getCurrentPlayer, incrementRound, reset };
+  return {
+    getRound,
+    getCurrentPlayer,
+    incrementRound,
+    reset,
+    flipInGame,
+    getInGame,
+    getPlayers,
+    win,
+  };
 })();
 
 const board = (function () {
@@ -72,6 +93,20 @@ const board = (function () {
   };
 
   const markArea = function ([row, column]) {
+    const player = gameFlow.getCurrentPlayer();
+    const index = cordsToIndex([row, column]);
+    //const sign = idToSign(player.getId());
+    const marker = player.getMarker();
+    cells[index] = marker;
+    console.log(cells);
+    if (checkWin([row, column])) {
+      gameFlow.win();
+      return;
+    }
+    gameFlow.incrementRound();
+  };
+
+  const validateArea = function ([row, column]) {
     if (
       row < 0 ||
       row > size - 1 ||
@@ -81,23 +116,14 @@ const board = (function () {
       column == null
     ) {
       console.log("Enter Valid area please");
-      return;
+      return false;
     }
-    const player = gameFlow.getCurrentPlayer();
-    const index = cordsToIndex([row, column]);
-    const area = cells.at(index);
+    const area = cells.at(cordsToIndex([row, column]));
     if (area != null) {
       console.log("Already filled by: " + area);
-      return;
+      return false;
     }
-    //const sign = idToSign(player.getId());
-    const marker = player.getMarker();
-    cells[index] = marker;
-    console.log(cells);
-    if (checkWin([row, column])) {
-      return;
-    }
-    gameFlow.incrementRound();
+    return true;
   };
 
   const checkWin = function ([row, column]) {
@@ -162,7 +188,7 @@ const board = (function () {
 
   populateCells();
 
-  return { markArea, populateCells, getSize, indexToCords };
+  return { markArea, populateCells, getSize, indexToCords, validateArea };
 })();
 
 const DOMboard = (function () {
@@ -187,16 +213,48 @@ const DOMboard = (function () {
   const addClickEvent = function (div) {
     div.addEventListener("click", () => {
       addMarker(div);
-      board.markArea(board.indexToCords(div.dataset.index));
     });
   };
 
   const addMarker = function (div) {
-    if(div.textContent != "") return;
-    div.textContent = gameFlow.getCurrentPlayer().getMarker();
-    div.classList.add("filled")
+    if (gameFlow.getInGame() == false) return false;
+    const cords = board.indexToCords(div.dataset.index);
+    if (board.validateArea(cords) == false) return;
+    
+    const currentPlayer = gameFlow.getCurrentPlayer();
+    div.textContent = currentPlayer.getMarker();
+    board.markArea(cords);
+
+    div.classList.add(currentPlayer.getId() == 1 ? "x" : "y");
     console.log("MARK");
   };
 
   createBoard();
 })();
+
+const DOMHeader = (function () {
+  const p1Name = document.querySelector(".p1-name");
+  const p2Name = document.querySelector(".p2-name");
+
+  const p1Score = document.querySelector(".p1-score");
+  const p2Score = document.querySelector(".p2-score");
+
+  const resetBtn = document.querySelector("#reset-btn");
+
+  const setScores = function () {
+    p1Score.textContent = gameFlow.getPlayers().at(0).getScore();
+    p2Score.textContent = gameFlow.getPlayers().at(1).getScore();
+  };
+
+  setScores();
+
+  return { setScores };
+})();
+
+//TODO:
+//remove hover when game over
+//win animation
+//when InGame = false reset btn shake interval
+//score increase animation
+//header load animation
+//board load animation?!

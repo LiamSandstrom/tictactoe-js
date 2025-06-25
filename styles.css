@@ -27,7 +27,8 @@ body {
 }
 
 .cell {
-  background-color: aliceblue;
+  background-color: rgba(240, 248, 255, 0.128);
+  outline: 1px solid rgba(255, 255, 255, 0.696);
   transition: scale 0.15s, background-color 0.5s ;
   display: flex;
   justify-content: center;
@@ -45,14 +46,24 @@ body {
   cursor: pointer;
 }
 
-.filled:hover {
+
+.x, .y{
+    outline: 3px solid white;
+}
+
+.x:hover, .y:hover{
+    scale: none;
     cursor: auto;
 }
 
-.filled{
+.y{
     background-color: black;
     color: white;
-    outline: 3px solid white;
+}
+
+.x{
+    background-color: white;
+    color: black;
 }
 
 /* HEADER */
