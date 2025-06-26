@@ -278,6 +278,7 @@ const DOMboard = (function () {
       { transform: "rotate(7deg)", offset: 0.9 },
       { transform: "rotate(0deg)", offset: 1.0 },
       { color: "gold", offset: 1.0 },
+      { outline: "3px solid orange", offset: 1.0 },
     ];
 
     const animTiming = {
@@ -291,7 +292,41 @@ const DOMboard = (function () {
         setTimeout(() => {
           console.log("win! " + index);
           cell.animate(anim, animTiming);
-        }, 90 * i);
+          setTimeout(() => {
+            cell.animate(
+              [
+                { transform: "scale(1.0)" },
+                { transform: "scale(0.95)" },
+                { transform: "scale(1.0)" },
+                { transform: "scale(0.95)" },
+                { transform: "scale(1.0)" },
+              ],
+              { duration: 3420, fill: "forwards" }
+            );
+          }, 580);
+          setInterval(() => {
+            cell.animate(
+              [
+                { transform: "scale(1.0)" },
+                { transform: "scale(0.94)" },
+                { transform: "scale(1.0)" },
+              ],
+              { duration: 300, fill: "forwards" }
+            );
+            setTimeout(() => {
+              cell.animate(
+                [
+                  { transform: "scale(1.0)" },
+                  { transform: "scale(0.96)" },
+                  { transform: "scale(1.0)" },
+                  { transform: "scale(0.96)" },
+                  { transform: "scale(1.0)" },
+                ],
+                { duration: 3620, fill: "forwards" }
+              );
+            }, 300);
+          }, 4000);
+        }, 400 * i);
       });
     }, 700);
   };
