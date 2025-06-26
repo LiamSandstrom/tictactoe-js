@@ -49,10 +49,11 @@ const gameFlow = (function () {
     inGame = !inGame;
   };
 
-  const win = function (player) {
+  const win = function (winCells) {
     flipInGame();
     DOMHeader.setScores();
     DOMboard.addGameOverCellStyle();
+    DOMboard.winAnimation(winCells);
   };
 
   const getRound = () => round;
@@ -102,8 +103,9 @@ const board = (function () {
     const marker = player.getMarker();
     cells[index] = marker;
     console.log(cells);
-    if (checkWin([row, column])) {
-      gameFlow.win();
+    const winCells = checkWin([row, column]);
+    if (winCells != null) {
+      gameFlow.win(winCells);
       return;
     }
     gameFlow.incrementRound();
@@ -132,12 +134,15 @@ const board = (function () {
   const checkWin = function ([row, column]) {
     if (gameFlow.getRound() < size * 2 - 1) return;
 
+    let winCells = [];
     console.log("CHECK WIN");
 
     const player = gameFlow.getCurrentPlayer();
 
     const checkVertical = function () {
+      winCells = [];
       for (let i = 0; i < size; i++) {
+        winCells.push(cordsToIndex([i, column]));
         if (cells.at(cordsToIndex([i, column])) != player.getMarker())
           return false;
       }
@@ -145,7 +150,9 @@ const board = (function () {
     };
 
     const checkHorizontal = function () {
+      winCells = [];
       for (let i = 0; i < size; i++) {
+        winCells.push(cordsToIndex([row, i]));
         if (cells.at(cordsToIndex([row, i])) != player.getMarker())
           return false;
       }
@@ -154,7 +161,9 @@ const board = (function () {
 
     const checkDiagonal = function () {
       const rightDiagonal = () => {
+        winCells = [];
         for (let i = 0; i < size * size; i += size + 1) {
+          winCells.push(i);
           if (cells.at(i) != player.getMarker()) {
             return false;
           }
@@ -164,7 +173,9 @@ const board = (function () {
       if (rightDiagonal()) return true;
 
       const leftDiagonal = () => {
+        winCells = [];
         for (let i = size - 1; i <= size + size; i += 2) {
+          winCells.push(i);
           if (cells.at(i) != player.getMarker()) {
             return false;
           }
@@ -182,9 +193,9 @@ const board = (function () {
     ) {
       console.log("WINNER: " + gameFlow.getCurrentPlayer().getName());
       gameFlow.getCurrentPlayer().incrementScore();
-      return true;
+      return winCells;
     }
-    return false;
+    return null;
   };
 
   const getSize = () => size;
@@ -205,15 +216,15 @@ const DOMboard = (function () {
   };
 
   const removeBoard = function () {
-    while(container.firstChild != null){
-        container.removeChild(container.firstChild);
+    while (container.firstChild != null) {
+      container.removeChild(container.firstChild);
     }
-  }
+  };
 
   const resetBoard = function () {
     removeBoard();
     createBoard();
-  }
+  };
 
   const createCell = function (i) {
     const div = document.createElement("div");
@@ -234,7 +245,7 @@ const DOMboard = (function () {
     if (gameFlow.getInGame() == false) return false;
     const cords = board.indexToCords(div.dataset.index);
     if (board.validateArea(cords) == false) return;
-    
+
     const currentPlayer = gameFlow.getCurrentPlayer();
     div.textContent = currentPlayer.getMarker();
     board.markArea(cords);
@@ -242,15 +253,33 @@ const DOMboard = (function () {
     div.classList.add(currentPlayer.getId() == 1 ? "x" : "y");
     console.log("MARK");
   };
-  
-  const addGameOverCellStyle = function(){
-    for(child of container.children){
-        child.classList.add("gameOverCell");
+
+  const addGameOverCellStyle = function () {
+    for (child of container.children) {
+      child.classList.add("gameOverCell");
     }
-  }
+  };
+
+  const winAnimation = function (cells) {
+    //get array of wining cells in order
+    //play an animation on each in order
+    for (child of container.children) {
+      child.style.transform = "scale(0.9)";
+    }
+
+    setTimeout(() => {
+      cells.forEach((index, i) => {
+        const cell = container.children[index];
+        setTimeout(() => {
+            console.log("win! " + index);
+          cell.style.transform = "scale(1)";
+        }, 100 * i);
+      });
+    }, 700);
+  };
 
   createBoard();
-  return {resetBoard, addGameOverCellStyle}
+  return { resetBoard, addGameOverCellStyle, winAnimation };
 })();
 
 const DOMHeader = (function () {
@@ -269,10 +298,9 @@ const DOMHeader = (function () {
 
   const setResetBtn = function () {
     resetBtn.addEventListener("click", () => {
-        gameFlow.reset();
-    })
-  }
-
+      gameFlow.reset();
+    });
+  };
 
   setScores();
   setResetBtn();

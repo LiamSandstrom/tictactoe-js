@@ -29,7 +29,7 @@ body {
 .cell {
   background-color: rgba(240, 248, 255, 0.128);
   outline: 1px solid rgba(255, 255, 255, 0.696);
-  transition: scale 0.15s, background-color 0.5s ;
+  transition: scale 0.15s, background-color 0.5s, transform 0.25s ;
   display: flex;
   justify-content: center;
   align-items: center;
