@@ -231,6 +231,7 @@ const DOMboard = (function () {
     div.classList.add("cell");
     div.dataset.index = i;
     addClickEvent(div);
+    addCellHoverEffect(div);
 
     container.appendChild(div);
   };
@@ -246,23 +247,26 @@ const DOMboard = (function () {
     const cords = board.indexToCords(div.dataset.index);
     if (board.validateArea(cords) == false) return;
 
+    removeCellHoverEffect(div);
     const currentPlayer = gameFlow.getCurrentPlayer();
     div.textContent = currentPlayer.getMarker();
     board.markArea(cords);
 
     div.classList.add(currentPlayer.getId() == 1 ? "x" : "y");
+    div.style.color = currentPlayer.getId() == 1 ? "black" : "white";
     console.log("MARK");
   };
 
   const addGameOverCellStyle = function () {
     for (child of container.children) {
       child.classList.add("gameOverCell");
+      removeCellHoverEffect(child);
     }
   };
 
   const winAnimation = function (cells) {
-    //get array of wining cells in order
-    //play an animation on each in order
+    //WARNING DIRTY CODE BUT IT WORKS
+
     for (child of container.children) {
       child.style.transform = "scale(0.9)";
     }
@@ -331,6 +335,33 @@ const DOMboard = (function () {
     }, 700);
   };
 
+  const addCellHoverEffect = function (div) {
+    div._onHover = () => onHover(div);
+    div._onHoverLeave = () => onHoverLeave(div);
+
+    div.addEventListener("mouseover", div._onHover);
+    div.addEventListener("mouseleave", div._onHoverLeave);
+  };
+
+  const removeCellHoverEffect = function (div) {
+    div.removeEventListener("mouseover", div._onHover);
+    div.removeEventListener("mouseleave", div._onHoverLeave);
+    const style = div.style.color = window.getComputedStyle(document.body);
+    if(div.classList.contains("x")){
+        div.style.color = style.getPropertyValue("--x-text-color")
+    }
+    else{
+        div.style.color = style.getPropertyValue("--y-text-color")
+    }
+  };
+  const onHover = function (div) {
+    div.style.color = "grey";
+    div.textContent = gameFlow.getCurrentPlayer().getMarker();
+  };
+  const onHoverLeave = function (div) {
+    div.textContent = "";
+  };
+
   createBoard();
   return { resetBoard, addGameOverCellStyle, winAnimation };
 })();
@@ -362,7 +393,7 @@ const DOMHeader = (function () {
 })();
 
 //TODO:
-//win animation
+//hover
 //when InGame = false reset btn shake interval
 //score increase animation
 //header load animation
