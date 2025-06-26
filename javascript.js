@@ -38,9 +38,11 @@ const gameFlow = (function () {
   };
 
   const reset = function () {
+    inGame = true;
     round = 1;
     currentPlayer = players.at(0);
     board.populateCells();
+    DOMboard.resetBoard();
   };
 
   const flipInGame = function () {
@@ -201,6 +203,17 @@ const DOMboard = (function () {
     }
   };
 
+  const removeBoard = function () {
+    while(container.firstChild != null){
+        container.removeChild(container.firstChild);
+    }
+  }
+
+  const resetBoard = function () {
+    removeBoard();
+    createBoard();
+  }
+
   const createCell = function (i) {
     const div = document.createElement("div");
     div.classList.add("cell");
@@ -230,6 +243,7 @@ const DOMboard = (function () {
   };
 
   createBoard();
+  return {resetBoard}
 })();
 
 const DOMHeader = (function () {
@@ -246,7 +260,14 @@ const DOMHeader = (function () {
     p2Score.textContent = gameFlow.getPlayers().at(1).getScore();
   };
 
+  const setResetBtn = function () {
+    resetBtn.addEventListener("click", () => {
+        gameFlow.reset();
+    })
+  }
+
   setScores();
+  setResetBtn();
 
   return { setScores };
 })();
