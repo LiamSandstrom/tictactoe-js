@@ -46,6 +46,10 @@ body {
   cursor: pointer;
 }
 
+.gameOverCell:hover{
+    scale: 1;
+  cursor: auto;
+}
 
 .x, .y{
     outline: 3px solid white;

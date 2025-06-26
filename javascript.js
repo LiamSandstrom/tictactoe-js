@@ -52,6 +52,7 @@ const gameFlow = (function () {
   const win = function (player) {
     flipInGame();
     DOMHeader.setScores();
+    DOMboard.addGameOverCellStyle();
   };
 
   const getRound = () => round;
@@ -241,9 +242,15 @@ const DOMboard = (function () {
     div.classList.add(currentPlayer.getId() == 1 ? "x" : "y");
     console.log("MARK");
   };
+  
+  const addGameOverCellStyle = function(){
+    for(child of container.children){
+        child.classList.add("gameOverCell");
+    }
+  }
 
   createBoard();
-  return {resetBoard}
+  return {resetBoard, addGameOverCellStyle}
 })();
 
 const DOMHeader = (function () {
@@ -266,6 +273,7 @@ const DOMHeader = (function () {
     })
   }
 
+
   setScores();
   setResetBtn();
 
@@ -273,7 +281,6 @@ const DOMHeader = (function () {
 })();
 
 //TODO:
-//remove hover when game over
 //win animation
 //when InGame = false reset btn shake interval
 //score increase animation
