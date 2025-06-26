@@ -267,13 +267,31 @@ const DOMboard = (function () {
       child.style.transform = "scale(0.9)";
     }
 
+    const anim = [
+      { transform: "scale(0.9)", offset: 0.0 },
+      { outline: "3px solid orange", offset: 0.2 },
+      { transform: "scale(1.0)", offset: 0.3 },
+      { transform: "rotate(7deg)", offset: 0.5 },
+      { outline: "3px solid blue", offset: 0.6 },
+      { transform: "rotate(-7deg)", offset: 0.7 },
+      { outline: "3px solid cyan", offset: 0.75 },
+      { transform: "rotate(7deg)", offset: 0.9 },
+      { transform: "rotate(0deg)", offset: 1.0 },
+      { color: "gold", offset: 1.0 },
+    ];
+
+    const animTiming = {
+      duration: 380,
+      fill: "forwards",
+    };
+
     setTimeout(() => {
       cells.forEach((index, i) => {
         const cell = container.children[index];
         setTimeout(() => {
-            console.log("win! " + index);
-          cell.style.transform = "scale(1)";
-        }, 100 * i);
+          console.log("win! " + index);
+          cell.animate(anim, animTiming);
+        }, 90 * i);
       });
     }, 700);
   };
