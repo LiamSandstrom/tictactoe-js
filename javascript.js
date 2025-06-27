@@ -179,7 +179,7 @@ const board = (function () {
 
       const leftDiagonal = () => {
         winCells = [];
-        for (let i = size - 1; i <= size + size; i += 2) {
+        for (let i = size - 1; i <= size * size - size; i += size - 1 ) {
           winCells.push(i);
           if (cells.at(i) != player.getMarker()) {
             return false;
@@ -258,12 +258,14 @@ const DOMboard = (function () {
     board.markArea(cords);
 
     div.classList.add(currentPlayer.getId() == 1 ? "x" : "y");
-    div.style.color = currentPlayer.getId() == 1 ? "black" : "white";
+    const xColor = window.getComputedStyle(document.body).getPropertyValue("--x-text-color")
+    const yColor = window.getComputedStyle(document.body).getPropertyValue("--y-text-color")
+    div.style.color = currentPlayer.getId() == 1 ? xColor : yColor;
     console.log("MARK");
   };
 
   const addGameOverCellStyle = function () {
-    for (child of container.children) {
+    for (const child of container.children) {
       child.classList.add("gameOverCell");
       removeCellHoverEffect(child);
     }
@@ -460,6 +462,3 @@ const introAnim = (function (){
     };
     body.animate(anim, animRules)
 })();
-//TODO:
-//header load animation
-//board load animation?!
