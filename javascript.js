@@ -8,7 +8,10 @@ const Player = function (newName, newId, newMarker) {
   const getId = () => id;
   const getMarker = () => marker;
   const getScore = () => score;
-  const incrementScore = () => score++;
+  const incrementScore = function (){
+    score++;
+    DOMHeader.scoreAnimation();
+  } 
 
   return { getName, getId, getMarker, getScore, incrementScore };
 };
@@ -56,7 +59,6 @@ const gameFlow = (function () {
     DOMboard.addGameOverCellStyle();
     DOMboard.winAnimation(winCells);
     DOMHeader.startBtnAnim();
-    
   };
 
   const getRound = () => round;
@@ -349,12 +351,11 @@ const DOMboard = (function () {
   const removeCellHoverEffect = function (div) {
     div.removeEventListener("mouseover", div._onHover);
     div.removeEventListener("mouseleave", div._onHoverLeave);
-    const style = div.style.color = window.getComputedStyle(document.body);
-    if(div.classList.contains("x")){
-        div.style.color = style.getPropertyValue("--x-text-color")
-    }
-    else{
-        div.style.color = style.getPropertyValue("--y-text-color")
+    const style = (div.style.color = window.getComputedStyle(document.body));
+    if (div.classList.contains("x")) {
+      div.style.color = style.getPropertyValue("--x-text-color");
+    } else {
+      div.style.color = style.getPropertyValue("--y-text-color");
     }
   };
   const onHover = function (div) {
@@ -391,16 +392,16 @@ const DOMHeader = (function () {
   };
 
   const startBtnAnim = function () {
-    if(animRef) return;
+    if (animRef) return;
     animRef = setInterval(resetBtnAnimation, 5000);
-  }
+  };
 
-  const endBtnAnim = function(){
+  const endBtnAnim = function () {
     clearInterval(animRef);
     animRef = null;
-  }
+  };
 
-  const resetBtnAnimation =  function(){
+  const resetBtnAnimation = function () {
     const anim = [
       { transform: "rotate(0)", offset: 0.0 },
       { transform: "rotate(-5deg)", offset: 0.2 },
@@ -410,22 +411,40 @@ const DOMHeader = (function () {
       { transform: "rotate(0deg)", offset: 1 },
     ];
     const animRules = {
-        duration: 300,
-        fill: "forwards"
-    }
+      duration: 300,
+      fill: "forwards",
+    };
 
     resetBtn.animate(anim, animRules);
-  }
+  };
 
+  const scoreAnimation = function () {
+    const id = gameFlow.getCurrentPlayer().getId();
+    const target = id == 1 ? p1Score : p2Score;
+    console.log("TAR: " + target)
+
+    const anim = [
+      { transform: "scale(1)", offset: 0.0 },
+      { transform: "scale(1.5)", offset: 0.5 },
+      { color: "lime", offset: 0.5 },
+      { transform: "scale(1.5)", offset: 0.7 },
+      { color: "lime", offset: 0.7 },
+      { transform: "scale(1)", offset: 1 },
+    ];
+    const animRules = {
+      duration: 300,
+      fill: "forwards",
+    };
+
+    target.animate(anim, animRules);
+  };
 
   setScores();
   setResetBtn();
 
-  return { setScores, startBtnAnim, endBtnAnim };
+  return { setScores, startBtnAnim, endBtnAnim, scoreAnimation };
 })();
 
 //TODO:
-//when InGame = false reset btn shake interval
-//score increase animation
 //header load animation
 //board load animation?!

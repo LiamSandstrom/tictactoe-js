@@ -130,3 +130,7 @@ button:hover {
   scale: 1.03;
   cursor: pointer;
 }
+
+.p1-score, .p2-score{
+    display: inline-block;
+}
