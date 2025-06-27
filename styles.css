@@ -37,6 +37,8 @@ body {
   gap: 10px;
 }
 
+
+
 .cell {
   background-color: var(--cell-bg-color);
   outline: 1px solid var(--cell-outline-color);

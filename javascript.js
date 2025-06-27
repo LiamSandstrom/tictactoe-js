@@ -445,6 +445,21 @@ const DOMHeader = (function () {
   return { setScores, startBtnAnim, endBtnAnim, scoreAnimation };
 })();
 
+
+const introAnim = (function (){
+    const body = document.body;
+
+    const anim = [
+      { opacity: "0", offset: 0.0 },
+      { opacity: "1", offset: 1.0 },
+    ];
+
+    const animRules = {
+      duration: 1000,
+      fill: "forwards",
+    };
+    body.animate(anim, animRules)
+})();
 //TODO:
 //header load animation
 //board load animation?!
