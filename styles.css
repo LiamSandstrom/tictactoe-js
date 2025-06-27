@@ -136,3 +136,10 @@ button:hover {
 .p1-score, .p2-score{
     display: inline-block;
 }
+
+@media screen and (max-width: 500px) {
+    
+    body{
+        scale: 0.69;
+    }
+}
