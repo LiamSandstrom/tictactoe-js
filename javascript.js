@@ -43,6 +43,7 @@ const gameFlow = (function () {
     currentPlayer = players.at(0);
     board.populateCells();
     DOMboard.resetBoard();
+    DOMHeader.endBtnAnim();
   };
 
   const flipInGame = function () {
@@ -54,6 +55,8 @@ const gameFlow = (function () {
     DOMHeader.setScores();
     DOMboard.addGameOverCellStyle();
     DOMboard.winAnimation(winCells);
+    DOMHeader.startBtnAnim();
+    
   };
 
   const getRound = () => round;
@@ -374,6 +377,7 @@ const DOMHeader = (function () {
   const p2Score = document.querySelector(".p2-score");
 
   const resetBtn = document.querySelector("#reset-btn");
+  let animRef;
 
   const setScores = function () {
     p1Score.textContent = gameFlow.getPlayers().at(0).getScore();
@@ -386,14 +390,41 @@ const DOMHeader = (function () {
     });
   };
 
+  const startBtnAnim = function () {
+    if(animRef) return;
+    animRef = setInterval(resetBtnAnimation, 5000);
+  }
+
+  const endBtnAnim = function(){
+    clearInterval(animRef);
+    animRef = null;
+  }
+
+  const resetBtnAnimation =  function(){
+    const anim = [
+      { transform: "rotate(0)", offset: 0.0 },
+      { transform: "rotate(-5deg)", offset: 0.2 },
+      { transform: "rotate(5deg)", offset: 0.4 },
+      { transform: "rotate(-5deg)", offset: 0.6 },
+      { transform: "rotate(5deg)", offset: 0.8 },
+      { transform: "rotate(0deg)", offset: 1 },
+    ];
+    const animRules = {
+        duration: 300,
+        fill: "forwards"
+    }
+
+    resetBtn.animate(anim, animRules);
+  }
+
+
   setScores();
   setResetBtn();
 
-  return { setScores };
+  return { setScores, startBtnAnim, endBtnAnim };
 })();
 
 //TODO:
-//hover
 //when InGame = false reset btn shake interval
 //score increase animation
 //header load animation
