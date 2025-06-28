@@ -8,10 +8,10 @@ const Player = function (newName, newId, newMarker) {
   const getId = () => id;
   const getMarker = () => marker;
   const getScore = () => score;
-  const incrementScore = function (){
+  const incrementScore = function () {
     score++;
     DOMHeader.scoreAnimation();
-  } 
+  };
 
   return { getName, getId, getMarker, getScore, incrementScore };
 };
@@ -47,6 +47,7 @@ const gameFlow = (function () {
     board.populateCells();
     DOMboard.resetBoard();
     DOMHeader.endBtnAnim();
+    DOMboard.cancelWinAnimation();
   };
 
   const flipInGame = function () {
@@ -179,7 +180,7 @@ const board = (function () {
 
       const leftDiagonal = () => {
         winCells = [];
-        for (let i = size - 1; i <= size * size - size; i += size - 1 ) {
+        for (let i = size - 1; i <= size * size - size; i += size - 1) {
           winCells.push(i);
           if (cells.at(i) != player.getMarker()) {
             return false;
@@ -213,6 +214,7 @@ const board = (function () {
 const DOMboard = (function () {
   const container = document.querySelector(".container");
   const size = board.getSize();
+  let winAnimationRef;
 
   const createBoard = function () {
     for (let i = 0; i < size * size; i++) {
@@ -258,8 +260,12 @@ const DOMboard = (function () {
     board.markArea(cords);
 
     div.classList.add(currentPlayer.getId() == 1 ? "x" : "y");
-    const xColor = window.getComputedStyle(document.body).getPropertyValue("--x-text-color")
-    const yColor = window.getComputedStyle(document.body).getPropertyValue("--y-text-color")
+    const xColor = window
+      .getComputedStyle(document.body)
+      .getPropertyValue("--x-text-color");
+    const yColor = window
+      .getComputedStyle(document.body)
+      .getPropertyValue("--y-text-color");
     div.style.color = currentPlayer.getId() == 1 ? xColor : yColor;
     console.log("MARK");
   };
@@ -297,7 +303,7 @@ const DOMboard = (function () {
       fill: "forwards",
     };
 
-    setTimeout(() => {
+    animRef = setTimeout(() => {
       cells.forEach((index, i) => {
         const cell = container.children[index];
         setTimeout(() => {
@@ -342,6 +348,10 @@ const DOMboard = (function () {
     }, 700);
   };
 
+  const cancelWinAnimation = function () {
+      clearTimeout(animRef);
+  };
+
   const addCellHoverEffect = function (div) {
     div._onHover = () => onHover(div);
     div._onHoverLeave = () => onHoverLeave(div);
@@ -369,7 +379,7 @@ const DOMboard = (function () {
   };
 
   createBoard();
-  return { resetBoard, addGameOverCellStyle, winAnimation };
+  return { resetBoard, addGameOverCellStyle, winAnimation, cancelWinAnimation };
 })();
 
 const DOMHeader = (function () {
@@ -423,7 +433,7 @@ const DOMHeader = (function () {
   const scoreAnimation = function () {
     const id = gameFlow.getCurrentPlayer().getId();
     const target = id == 1 ? p1Score : p2Score;
-    console.log("TAR: " + target)
+    console.log("TAR: " + target);
 
     const anim = [
       { transform: "scale(1)", offset: 0.0 },
@@ -447,18 +457,17 @@ const DOMHeader = (function () {
   return { setScores, startBtnAnim, endBtnAnim, scoreAnimation };
 })();
 
+const introAnim = (function () {
+  const body = document.body;
 
-const introAnim = (function (){
-    const body = document.body;
+  const anim = [
+    { opacity: "0", offset: 0.0 },
+    { opacity: "1", offset: 1.0 },
+  ];
 
-    const anim = [
-      { opacity: "0", offset: 0.0 },
-      { opacity: "1", offset: 1.0 },
-    ];
-
-    const animRules = {
-      duration: 1000,
-      fill: "forwards",
-    };
-    body.animate(anim, animRules)
+  const animRules = {
+    duration: 1000,
+    fill: "forwards",
+  };
+  body.animate(anim, animRules);
 })();
